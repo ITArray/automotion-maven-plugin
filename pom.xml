@@ -7,6 +7,33 @@
     <groupId>net.itarray</groupId>
     <artifactId>automotion-maven-plugin</artifactId>
     <version>1.0.0</version>
+    <packaging>maven-plugin</packaging>
+    <name>Automotion Maven plugin</name>
+    <description>Library for smart visual automation testing</description>
+    <url>https://automotion.itarray.net</url>
+
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>https://github.com/ITArray/Automotion/blob/master/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>ITArray</name>
+            <email>denys.zaiats@gmail.com</email>
+            <organization>ITArray</organization>
+            <organizationUrl>https://www.itarray.net</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:ITArray/automotion-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:ITArray/automotion-maven-plugin.git</developerConnection>
+        <url>git@github.com:ITArray/automotion-maven-plugin.git</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -17,8 +44,46 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <stagingProfileId>22f8da536d8418</stagingProfileId> <!--Staging-->
+                    <!--<stagingProfileId>7edbe315063867</stagingProfileId> &lt;!&ndash;Central staging&ndash;&gt;-->
+                    <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
