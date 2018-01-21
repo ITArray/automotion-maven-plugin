@@ -1,6 +1,7 @@
 package net.itarray.automotion.reporting;
 
 import com.webfirmframework.wffweb.tag.html.Body;
+import com.webfirmframework.wffweb.tag.html.H1;
 import com.webfirmframework.wffweb.tag.html.Html;
 import com.webfirmframework.wffweb.tag.html.TitleTag;
 import com.webfirmframework.wffweb.tag.html.attribute.Href;
@@ -9,6 +10,7 @@ import com.webfirmframework.wffweb.tag.html.attribute.Target;
 import com.webfirmframework.wffweb.tag.html.attribute.global.ClassAttribute;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Style;
 import com.webfirmframework.wffweb.tag.html.frames.IFrame;
+import com.webfirmframework.wffweb.tag.html.images.Img;
 import com.webfirmframework.wffweb.tag.html.links.A;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
 import com.webfirmframework.wffweb.tag.html.programming.Script;
@@ -22,7 +24,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Mojo(name = "automotion-report")
@@ -66,12 +70,12 @@ public class FinalReportBuilder extends AbstractMojo {
                 }};
                 new StyleTag(this) {{
                     new NoTag(this, ".accordion {\n" +
-                            "    background-color: #eee;\n" +
-                            "    color: #444;\n" +
+                            "    background-color: #404040;\n" +
+                            "    color: #f5f5f5;\n" +
                             "    cursor: pointer;\n" +
                             "    padding: 18px;\n" +
                             "    width: 100%;\n" +
-                            "    border: none;\n" +
+                            "    border-radius: 5px;\n" +
                             "    text-align: left;\n" +
                             "    outline: none;\n" +
                             "    font-size: 15px;\n" +
@@ -79,7 +83,7 @@ public class FinalReportBuilder extends AbstractMojo {
                             "}\n" +
                             "\n" +
                             ".active, .accordion:hover {\n" +
-                            "    background-color: #ccc; \n" +
+                            "    background-color: #333; \n" +
                             "}\n" +
                             "\n" +
                             ".panel {\n" +
@@ -101,30 +105,46 @@ public class FinalReportBuilder extends AbstractMojo {
             new Body(this,
                     new Style("background-color: #F5F5F5")) {{
                 new Div(this, new ClassAttribute("container-fluid")) {{
+                    new Div(this,
+                            new ClassAttribute("row"),
+                            new Style("padding: 5px; background-color: rgb(0,191,255);")) {{
+                        new Img(this,
+                                new Style("width: 90px"),
+                                new ClassAttribute("col-md-1"),
+                                new Src("https://automotion.itarray.net/wp-content/uploads/2017/09/automotion_logo@256.png"));
+                        new Div(this,
+                                new ClassAttribute("col-md-8"),
+                                new Style("color: white;")) {{
+                            new H1(this,
+                                    new Style("font-size:22px; font-weight: 200;")) {{
+                                new NoTag(this, String.format("Automotion report from: %s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+                            }};
+                        }};
+                    }};
                     for (final String s : files) {
                         new Div(this,
                                 new ClassAttribute("row"),
                                 new Style("background-color: #fff; padding: 10px; margin-top: 3px")) {{
                             new Div(this,
                                     new ClassAttribute("accordion"),
-                                    new Style("width: auto; color: #4d4d4d; text-align:left; font-size: 28px; font-weight: 300")) {{
+                                    new Style("width: auto; text-align:left; font-size: 28px; font-weight: 300")) {{
                                 new NoTag(this, s);
                                 new A(this,
                                         new Style("float: right"),
                                         new ClassAttribute("btn btn-info"),
                                         new Href("html/" + s),
                                         new Target("target")
-                                        ){{
-                                            new NoTag(this, "Fullscreen");
+                                ) {{
+                                    new NoTag(this, "Fullscreen");
                                 }};
                             }};
 
                             new Div(this,
                                     //new Style("background: #f5f5f5"),
                                     new ClassAttribute("panel")) {{
-                                        new IFrame(this,
-                                                new Style("width: 100%; height: 1000px"),
-                                                new Src("html/" + s));
+                                new IFrame(this,
+                                        new Style("width: 100%; height: 1000px"),
+                                        new Src("html/" + s));
 
                             }};
                         }};
