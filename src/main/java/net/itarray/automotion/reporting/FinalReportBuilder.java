@@ -8,6 +8,7 @@ import com.webfirmframework.wffweb.tag.html.attribute.Href;
 import com.webfirmframework.wffweb.tag.html.attribute.Src;
 import com.webfirmframework.wffweb.tag.html.attribute.Target;
 import com.webfirmframework.wffweb.tag.html.attribute.global.ClassAttribute;
+import com.webfirmframework.wffweb.tag.html.attribute.global.Id;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Style;
 import com.webfirmframework.wffweb.tag.html.frames.IFrame;
 import com.webfirmframework.wffweb.tag.html.images.Img;
@@ -25,7 +26,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Mojo(name = "automotion-report")
 public class FinalReportBuilder extends AbstractMojo {
@@ -34,13 +37,15 @@ public class FinalReportBuilder extends AbstractMojo {
     private static final String TARGET_AUTOMOTION_HTML = TARGET_AUTOMOTION + "html/";
     private static final String TARGET_AUTOMOTION_HTML_SUCESS = TARGET_AUTOMOTION_HTML + "success/";
     private static final String TARGET_AUTOMOTION_HTML_FAILURE = TARGET_AUTOMOTION_HTML + "failure/";
+    private File[] listOfFilesSuccess;
+    private File[] listOfFilesFailure;
 
     @Override
     public void execute() {
         TreeMap<String, Boolean> files = new TreeMap<>();
 
         File folderSuccess = new File(TARGET_AUTOMOTION_HTML_SUCESS);
-        File[] listOfFilesSuccess = folderSuccess.listFiles();
+        listOfFilesSuccess = folderSuccess.listFiles();
         if (listOfFilesSuccess != null) {
             for (File file : listOfFilesSuccess) {
                 files.put(file.getName(), true);
@@ -48,7 +53,7 @@ public class FinalReportBuilder extends AbstractMojo {
         }
 
         File folderFailure = new File(TARGET_AUTOMOTION_HTML_FAILURE);
-        File[] listOfFilesFailure = folderFailure.listFiles();
+        listOfFilesFailure = folderFailure.listFiles();
         if (listOfFilesFailure != null) {
             for (File file : listOfFilesFailure) {
                 files.put(file.getName(), false);
@@ -71,7 +76,7 @@ public class FinalReportBuilder extends AbstractMojo {
 
     private Html buildHtml(final TreeMap<String, Boolean> files) {
         return new Html(null,
-                new Style("background-color: #F5F5F5")) {{
+                new Style("background-color: #fff")) {{
             super.setPrependDocType(true);
             new Head(this) {{
                 new TitleTag(this) {{
@@ -109,10 +114,12 @@ public class FinalReportBuilder extends AbstractMojo {
                 new NoTag(this, "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
                 new NoTag(this, "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css\" integrity=\"sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp\" crossorigin=\"anonymous\">");
                 new NoTag(this, "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js\" integrity=\"sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa\" crossorigin=\"anonymous\"></script>");
+                new Script(this, new Src("https://cdn.plot.ly/plotly-latest.min.js"));
+                new Script(this, new Src("https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"));
             }};
 
             new Body(this,
-                    new Style("background-color: #F5F5F5")) {{
+                    new Style("background-color: #fff")) {{
                 new Div(this, new ClassAttribute("container-fluid")) {{
                     new Div(this,
                             new ClassAttribute("row"),
@@ -130,7 +137,14 @@ public class FinalReportBuilder extends AbstractMojo {
                             }};
                         }};
                     }};
-                    for (final Map.Entry<String, Boolean> entry: files.entrySet()) {
+                    new Div(this,
+                            new ClassAttribute("row")) {{
+                        new Div(this,
+                                new ClassAttribute("col-xs-12 col-sm-6 col-md-4"),
+                                new Id("plot")) {{
+                        }};
+                    }};
+                    for (final Map.Entry<String, Boolean> entry : files.entrySet()) {
 
                         final String s = entry.getKey();
                         String statusFolder = "success/";
@@ -168,6 +182,25 @@ public class FinalReportBuilder extends AbstractMojo {
                             }};
                         }};
                     }
+                }};
+
+                new Script(this) {{
+                    new NoTag(this, "" +
+                            "var data = [{\n" +
+                            "  values: [" + listOfFilesSuccess.length + ", " + listOfFilesFailure.length + "],\n" +
+                            "  labels: ['Passed', 'Failed'],\n" +
+                            "  type: 'pie',\n" +
+                            "  marker: {colors: ['rgb(60,179,113)', 'rgb(255,99,71)']},\n" +
+                            "  hole: .4\n" +
+                            "}];\n" +
+                            "\n" +
+                            "var layout = {\n" +
+                            "  title: 'Stats of test suites',\n" +
+                            "  height: 400,\n" +
+                            "  width: 500,\n" +
+                            "};\n" +
+                            "\n" +
+                            "Plotly.newPlot('plot', data, layout);");
                 }};
 
                 new Script(this) {{
