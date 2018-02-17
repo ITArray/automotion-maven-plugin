@@ -25,24 +25,33 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Mojo(name = "automotion-report")
 public class FinalReportBuilder extends AbstractMojo {
 
     private static final String TARGET_AUTOMOTION = "target/automotion/";
     private static final String TARGET_AUTOMOTION_HTML = TARGET_AUTOMOTION + "html/";
+    private static final String TARGET_AUTOMOTION_HTML_SUCESS = TARGET_AUTOMOTION_HTML + "success/";
+    private static final String TARGET_AUTOMOTION_HTML_FAILURE = TARGET_AUTOMOTION_HTML + "failure/";
 
     @Override
     public void execute() {
-        File folder = new File(TARGET_AUTOMOTION_HTML);
-        File[] listOfFiles = folder.listFiles();
-        List<String> files = new ArrayList<>();
-        if (listOfFiles != null) {
-            for (File file : listOfFiles) {
-                files.add(file.getName());
+        TreeMap<String, Boolean> files = new TreeMap<>();
+
+        File folderSuccess = new File(TARGET_AUTOMOTION_HTML_SUCESS);
+        File[] listOfFilesSuccess = folderSuccess.listFiles();
+        if (listOfFilesSuccess != null) {
+            for (File file : listOfFilesSuccess) {
+                files.put(file.getName(), true);
+            }
+        }
+
+        File folderFailure = new File(TARGET_AUTOMOTION_HTML_FAILURE);
+        File[] listOfFilesFailure = folderFailure.listFiles();
+        if (listOfFilesFailure != null) {
+            for (File file : listOfFilesFailure) {
+                files.put(file.getName(), false);
             }
         }
 
@@ -60,7 +69,7 @@ public class FinalReportBuilder extends AbstractMojo {
         }
     }
 
-    private Html buildHtml(final List<String> files) {
+    private Html buildHtml(final TreeMap<String, Boolean> files) {
         return new Html(null,
                 new Style("background-color: #F5F5F5")) {{
             super.setPrependDocType(true);
@@ -121,7 +130,16 @@ public class FinalReportBuilder extends AbstractMojo {
                             }};
                         }};
                     }};
-                    for (final String s : files) {
+                    for (final Map.Entry<String, Boolean> entry: files.entrySet()) {
+
+                        final String s = entry.getKey();
+                        String statusFolder = "success/";
+                        if (!entry.getValue()) {
+                            statusFolder = "failure/";
+                        }
+
+                        final String finalStatusFolder = statusFolder;
+
                         new Div(this,
                                 new ClassAttribute("row"),
                                 new Style("background-color: #fff; padding: 10px; margin-top: 3px")) {{
@@ -131,20 +149,21 @@ public class FinalReportBuilder extends AbstractMojo {
                                 new NoTag(this, s);
                                 new A(this,
                                         new Style("float: right"),
-                                        new ClassAttribute("btn btn-info"),
-                                        new Href("html/" + s),
+                                        new ClassAttribute("btn " + (entry.getValue() ? "btn-success" : "btn-danger")),
+                                        new Href("html/" + finalStatusFolder + s),
                                         new Target("target")
                                 ) {{
                                     new NoTag(this, "Fullscreen");
                                 }};
                             }};
 
+
                             new Div(this,
                                     //new Style("background: #f5f5f5"),
                                     new ClassAttribute("panel")) {{
                                 new IFrame(this,
                                         new Style("width: 100%; height: 1000px"),
-                                        new Src("html/" + s));
+                                        new Src("html/" + finalStatusFolder + s));
 
                             }};
                         }};
