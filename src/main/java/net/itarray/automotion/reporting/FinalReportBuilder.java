@@ -37,41 +37,48 @@ public class FinalReportBuilder extends AbstractMojo {
     private static final String TARGET_AUTOMOTION_HTML = TARGET_AUTOMOTION + "html/";
     private static final String TARGET_AUTOMOTION_HTML_SUCESS = TARGET_AUTOMOTION_HTML + "success/";
     private static final String TARGET_AUTOMOTION_HTML_FAILURE = TARGET_AUTOMOTION_HTML + "failure/";
-    private File[] listOfFilesSuccess;
-    private File[] listOfFilesFailure;
+    private File[] listOfFilesSuccess = new File[0];
+    private File[] listOfFilesFailure = new File[0];
 
     @Override
     public void execute() {
         TreeMap<String, Boolean> files = new TreeMap<>();
 
         File folderSuccess = new File(TARGET_AUTOMOTION_HTML_SUCESS);
-        listOfFilesSuccess = folderSuccess.listFiles();
-        if (listOfFilesSuccess != null) {
-            for (File file : listOfFilesSuccess) {
-                files.put(file.getName(), true);
+        if (folderSuccess.exists()) {
+            listOfFilesSuccess = folderSuccess.listFiles();
+            if (listOfFilesSuccess != null) {
+                for (File file : listOfFilesSuccess) {
+                    files.put(file.getName(), true);
+                }
             }
         }
 
         File folderFailure = new File(TARGET_AUTOMOTION_HTML_FAILURE);
-        listOfFilesFailure = folderFailure.listFiles();
-        if (listOfFilesFailure != null) {
-            for (File file : listOfFilesFailure) {
-                files.put(file.getName(), false);
+        if (folderFailure.exists()) {
+            listOfFilesFailure = folderFailure.listFiles();
+            if (listOfFilesFailure != null) {
+                for (File file : listOfFilesFailure) {
+                    files.put(file.getName(), false);
+                }
             }
         }
 
-        Html html = buildHtml(files);
+        if (files.size() > 0) {
+            Html html = buildHtml(files);
 
-        File report = new File(TARGET_AUTOMOTION + "index.html");
-        report.getParentFile().mkdirs();
-        try (FileOutputStream fos = new FileOutputStream(report);
-             BufferedOutputStream bos = new BufferedOutputStream(fos);) {
+            File report = new File(TARGET_AUTOMOTION + "index.html");
+            report.getParentFile().mkdirs();
+            try (FileOutputStream fos = new FileOutputStream(report);
+                 BufferedOutputStream bos = new BufferedOutputStream(fos)) {
 
-            html.toOutputStream(bos);
-            bos.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+                html.toOutputStream(bos);
+                bos.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     private Html buildHtml(final TreeMap<String, Boolean> files) {
@@ -84,8 +91,8 @@ public class FinalReportBuilder extends AbstractMojo {
                 }};
                 new StyleTag(this) {{
                     new NoTag(this, ".accordion {\n" +
-                            "    background-color: #404040;\n" +
-                            "    color: #f5f5f5;\n" +
+                            "    background-color: #f5f5f5;\n" +
+                            "    color: #4d4d4d;\n" +
                             "    cursor: pointer;\n" +
                             "    padding: 18px;\n" +
                             "    width: 100%;\n" +
@@ -94,10 +101,12 @@ public class FinalReportBuilder extends AbstractMojo {
                             "    outline: none;\n" +
                             "    font-size: 15px;\n" +
                             "    transition: 0.4s;\n" +
+                            "    box-shadow: 1px 1px 5px grey;\n" +
                             "}\n" +
                             "\n" +
                             ".active, .accordion:hover {\n" +
                             "    background-color: #333; \n" +
+                            "    color: #f5f5f5; \n" +
                             "}\n" +
                             "\n" +
                             ".panel {\n" +
