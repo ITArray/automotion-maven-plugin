@@ -27,8 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Mojo(name = "automotion-report")
 public class FinalReportBuilder extends AbstractMojo {
@@ -42,17 +42,7 @@ public class FinalReportBuilder extends AbstractMojo {
 
     @Override
     public void execute() {
-        TreeMap<String, Boolean> files = new TreeMap<>();
-
-        File folderSuccess = new File(TARGET_AUTOMOTION_HTML_SUCESS);
-        if (folderSuccess.exists()) {
-            listOfFilesSuccess = folderSuccess.listFiles();
-            if (listOfFilesSuccess != null) {
-                for (File file : listOfFilesSuccess) {
-                    files.put(file.getName(), true);
-                }
-            }
-        }
+        LinkedHashMap<String, Boolean> files = new LinkedHashMap<>();
 
         File folderFailure = new File(TARGET_AUTOMOTION_HTML_FAILURE);
         if (folderFailure.exists()) {
@@ -60,6 +50,16 @@ public class FinalReportBuilder extends AbstractMojo {
             if (listOfFilesFailure != null) {
                 for (File file : listOfFilesFailure) {
                     files.put(file.getName(), false);
+                }
+            }
+        }
+
+        File folderSuccess = new File(TARGET_AUTOMOTION_HTML_SUCESS);
+        if (folderSuccess.exists()) {
+            listOfFilesSuccess = folderSuccess.listFiles();
+            if (listOfFilesSuccess != null) {
+                for (File file : listOfFilesSuccess) {
+                    files.put(file.getName(), true);
                 }
             }
         }
@@ -81,7 +81,7 @@ public class FinalReportBuilder extends AbstractMojo {
 
     }
 
-    private Html buildHtml(final TreeMap<String, Boolean> files) {
+    private Html buildHtml(final LinkedHashMap<String, Boolean> files) {
         return new Html(null,
                 new Style("background-color: #fff")) {{
             super.setPrependDocType(true);
@@ -105,8 +105,8 @@ public class FinalReportBuilder extends AbstractMojo {
                             "}\n" +
                             "\n" +
                             ".active, .accordion:hover {\n" +
-                            "    background-color: #333; \n" +
-                            "    color: #f5f5f5; \n" +
+                            "    background-color: #e4e4e4; \n" +
+                            "    color: #4d4d4d; \n" +
                             "}\n" +
                             "\n" +
                             ".panel {\n" +
