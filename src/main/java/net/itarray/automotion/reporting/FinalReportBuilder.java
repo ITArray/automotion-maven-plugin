@@ -10,7 +10,6 @@ import com.webfirmframework.wffweb.tag.html.attribute.Target;
 import com.webfirmframework.wffweb.tag.html.attribute.global.ClassAttribute;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Id;
 import com.webfirmframework.wffweb.tag.html.attribute.global.Style;
-import com.webfirmframework.wffweb.tag.html.frames.IFrame;
 import com.webfirmframework.wffweb.tag.html.images.Img;
 import com.webfirmframework.wffweb.tag.html.links.A;
 import com.webfirmframework.wffweb.tag.html.metainfo.Head;
@@ -184,9 +183,10 @@ public class FinalReportBuilder extends AbstractMojo {
                             new Div(this,
                                     //new Style("background: #f5f5f5"),
                                     new ClassAttribute("panel")) {{
-                                new IFrame(this,
-                                        new Style("width: 100%; height: 1000px"),
-                                        new Src("html/" + finalStatusFolder + s));
+                                new NoTag(this, "html/" + finalStatusFolder + s);
+//                                new IFrame(this,
+//                                        new Style("width: 100%; height: 1000px"),
+//                                        new Src("html/" + finalStatusFolder + s));
 
                             }};
                         }};
@@ -224,6 +224,13 @@ public class FinalReportBuilder extends AbstractMojo {
                             "            panel.style.display = \"none\";\n" +
                             "        } else {\n" +
                             "            panel.style.display = \"block\";\n" +
+                            "            if (panel.textContent != \"\") {\n" +
+                            "            var iframe = document.createElement(\"iframe\");\n" +
+                            "            iframe.src = panel.textContent;\n" +
+                            "            iframe.style = \"width: 100%; height: 500px\";" +
+                            "            panel.textContent = \"\";" +
+                            "            panel.append(iframe);\n" +
+                            "        }\n" +
                             "        }\n" +
                             "    });\n" +
                             "}");
