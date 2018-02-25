@@ -131,7 +131,7 @@ public class FinalReportBuilder extends AbstractMojo {
                 new Div(this, new ClassAttribute("container-fluid")) {{
                     new Div(this,
                             new ClassAttribute("row"),
-                            new Style("padding: 5px; background-color: rgb(0,191,255);")) {{
+                            new Style("padding: 5px; background-color: slategrey;")) {{
                         new Img(this,
                                 new Style("width: 90px"),
                                 new ClassAttribute("col-md-1"),
